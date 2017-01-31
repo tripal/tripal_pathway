@@ -1,0 +1,163 @@
+<?php
+
+/**
+ * @file
+ * The main file for the tripal go module.
+ */
+
+// pwy (Pathway File) Node functionality
+require_once 'includes/pwy_tool.node.inc';
+
+// Functions specific to themeing (ie: preprocess)
+require_once 'theme/pwy_tool.theme.inc';
+
+// Application Programmers Interface
+require_once 'api/pwy_tool.api.inc';
+
+// Administration for furture
+require_once 'includes/pwy_tool.admin.inc';
+
+/**
+ * Implements hook_menu().
+ */
+function pwy_tool_menu() {
+  // pwy enrich form
+  $items['pwyenrich'] = array(
+    'title' => 'Pathway enrichment analysis',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('pwy_tool_enrich_form', 1, 2),
+    'access arguments' => array('access content'),
+    'file' => 'includes/pwy_tool.form_pwyenrich.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  // pwy (pathway) dataset Node 
+  // -- add pwy file to specific type of content
+  // -- these pwy file will be used for analysis
+  $items['node__pwy'] = array(
+    'template' => 'node--pwy',
+    'render element' => 'node',
+    'base hook' => 'node',
+    'path' => 'theme',
+  );
+
+  // pwy enrich results page
+  $items['pwyenrich/report/%'] = array(
+    'title' => 'Pathway enrichment results',
+    'page callback' => 'show_pwy_enrich_output',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  // pwy tool admin for furture
+  //$items['admin/tripal/extension/tripal_pathway'] = array(
+  //  'title' => 'Tripal GO User Interface',
+  //  'description' => 'Provides an interface allowing users to execute their own GO analysis.',
+  //  'page callback' => 'drupal_get_form',
+  //  'page arguments' => array('go_tool_admin_form'),
+  //  'access arguments' => array('administer tripal'),
+  //  'type' => MENU_NORMAL_ITEM,
+  //);
+
+  // help
+  $items['admin/tripal/extension/tripal_pathway/help'] = array(
+    'title' => 'Help',
+    'page callback' => 'theme',
+    'page arguments' => array('pwy_tool_help'),
+    'access arguments' => array('administer tripal'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function pwy_tool_theme() {
+
+  $items = array();
+  $path = drupal_get_path('module', 'pwy_tool');
+
+  // explain the detail
+  // this hook create a array of theme through array item
+  // the key in array is like show_goenrich_report
+  // the value tell drupal where to find template page 
+  //   template: template name, and file must has suffix .tpl.php 
+  //   path: where to find template file 
+  // use theme('key') to call the them
+
+  // Displays the pwy enrich results for each job
+  $items['show_pwyenrich_report'] = array(
+    'template' => 'pwyenrich_report',
+    'path' => "$path/theme",
+  );
+
+  $items['pwyenrich_report_pending'] = array(
+    'template' => 'pwyenrich_report_pending',
+    'path' => "$path/theme",
+  );
+
+  // Module Help
+  $items['pwy_tool_help'] = array(
+    'template' => 'pwy_tool_help',
+    'path' => "$path/theme",
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_help().
+ */
+function pwy_tool_help($path, $arg) {
+  if ($path == 'admin/help#pwy_tool') {
+    return theme('pwy_tool_help');
+  }
+}
+
+/**
+ * Facilitate presenting the result of the go enrichment 
+ *
+ * @param $job_id
+ *  The tripal job_id of the go enrich job previously submitted
+ *
+ * @return $result
+ *  Return HTML output of the go enrich results to be displayed to the user
+ *
+ */
+
+function show_pwy_enrich_output($job_string) {
+
+  // pwy enrich analysis runs as a Tripal job. As such we need to determine whether the current
+  // analysis is in the queue, running or complete in order to determine what to show the user
+  //decode the job_id
+  $job_id = pwy_tool_reveal_secret($job_string);
+  $job = tripal_get_job($job_id);
+
+  // 1) Job is in the Queue
+  if ($job->start_time === NULL AND $job->end_time == NULL) {
+
+    return theme('pwyenrich_report_pending', array('status_code' => 0, 'status' => 'Pending'));
+  }
+  // 2) Job has been Cancelled
+  elseif ($job->status == 'Cancelled') {
+
+    return theme('pwyenrich_report_pending', array('status_code' => 999, 'status' => 'Cancelled'));
+  }
+  // 3) Job is Complete
+  elseif ($job->end_time !== NULL) {
+    // Return the Results :)
+    return theme('show_pwyenrich_report', array('job_id' => $job_id));
+
+  }
+  // 4) Job is in Progress
+  else {
+    return theme('pwyenrich_report_pending', array('status_code' => 1, 'status' => 'Running'));
+  }
+
+
+  return '';
+}
+

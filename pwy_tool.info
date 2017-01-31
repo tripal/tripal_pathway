@@ -1,0 +1,7 @@
+name = Pathway Tool
+description = Provides a user interface to allow your to perform pathway enrichment analysis
+configure = admin/tripal/extension/tripal_pathway/pwy_tool
+project = tripal_pathway
+package = Tripal Extensions
+core = 7.x
+

@@ -1,0 +1,79 @@
+<?php
+
+/**
+ * @file
+ * Contains hooks to handle installation of this module.
+ *
+ */
+
+/**
+ * Implements hook_install().
+ * create folder tripal_pathway under: default/files/tripal/
+ */
+function pwy_tool_install() {
+   tripal_create_files_dir('tripal_pathway');
+}
+
+/**
+ * Implements hook_schema().
+ * Create the pwy table for storing pwy File related to pwy nodes.
+ *
+ */
+function pwy_tool_schema() {
+
+  // table for store pwy file name and path
+  $schema['pwy'] = array(
+    'description' => t('The table for pwy node'),
+    'fields' => array(
+      'nid' => array(
+        'description' => t('The primary identifier for a node.'),
+        'type' => 'serial',
+        'unsigned' => true,
+        'not null' => true,
+      ),
+      'name' => array(
+        'description' => t('The human-readable name of the pathway file.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+      ),
+      'path' => array(
+        'description' => t('The full path of the pathway file.'),
+        'type' => 'varchar',
+        'length' => 1023,
+        'not null' => true,
+      ),
+      'idlink' => array(
+        'description' => t('base link of gene ID icugi.org/feature/gene'),
+        'type' => 'varchar',
+        'length' => 1023,
+        'not null' => true,
+      ),
+      'dblink' => array(
+        'description' => t('base link of pathway database icugipwy.org:1555/CUCUMBER_GENOME_V2.'),
+        'type' => 'varchar',
+        'length' => 1023,
+        'not null' => true,
+      ),
+      'idexample' => array(
+        'description' => t('example IDs.'),
+        'type' => 'varchar',
+        'length' => 1023,
+        'not null' => true,
+      ),
+    ),
+    
+    'indexes' => array(
+      'name' => array('name'),
+    ),
+    
+    'primary key' => array('nid'),
+      
+    'unique keys' => array(
+      'nid' => array('nid'),
+    ),
+  );
+  
+  return $schema;
+}
+
