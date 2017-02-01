@@ -38,7 +38,7 @@ function pwy_tool_menu() {
     'template' => 'node--pwy',
     'render element' => 'node',
     'base hook' => 'node',
-    'path' => 'theme',
+    'path' => 'themey',
   );
 
   // pwy enrich results page

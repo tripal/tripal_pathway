@@ -74,7 +74,7 @@ function pwy_form($node, &$form_state) {
 
   $form['core']['db_name']= array(
     '#type' => 'textfield',
-    '#title' => t('Human-readable Name for pwy File'),
+    '#title' => t('Human-readable Name for pathway annotation file'),
     '#required' => TRUE,
     '#default_value' => isset($node->db_name) ? $node->db_name : '',
     '#description' => t('For example: watermelon genome (97103)'),
@@ -82,8 +82,8 @@ function pwy_form($node, &$form_state) {
 
   $form['core']['db_path']= array(
     '#type' => 'textfield',
-    '#title' => t('File Prefix including Full Path'),
-    '#description' => t('The full path to your pwy. For example, /home/web/pathway/watermelon_97103_pwy'),
+    '#title' => t('Full path of pathway annotation file'),
+    '#description' => t('For example, /var/www/html/sites/all/modules/tripal_pathway/example/wm_97103_kept.pwy'),
     '#required' => TRUE,
     '#default_value' => isset($node->db_path) ? $node->db_path : '',
   );
@@ -91,22 +91,22 @@ function pwy_form($node, &$form_state) {
   $form['core']['db_idlink'] = array(
     '#type' => 'textfield',
     '#title' => t('Link of gene ID'),
-    '#description' => t('For example，www.icugi.org/feature/gene'),
+    '#description' => t('For example，www.watermelongenome.org/feature/gene/'),
     '#required' => TRUE,
     '#default_value' => isset($node->db_idlink) ? $node->db_idlink : '',
   );
 
   $form['core']['db_dblink'] = array(
     '#type' => 'textfield',
-    '#title' => t('Basic link of the pathway tool web site'),
-    '#description' => t('For example, 132.236.156.168:1555/WATERMELON_GENOME'),
+    '#title' => t('Link of the pathway ID'),
+    '#description' => t('For example, www.watermelongenome.org:1555/WATERMELON_GENOME/new-image?object='),
     '#required' => TRUE,
     '#default_value' => isset($node->db_dblink) ? $node->db_dblink : '',
   );
 
   $form['core']['db_example_id'] = array(
     '#type' => 'textarea',
-    '#title' => t('Example of IDs One, ID for each line '),
+    '#title' => t('Example of IDs. One ID for each line '),
     '#required' => TRUE,
     '#default_value' => isset($node->db_example_id) ? $node->db_example_id : '',
     '#description' => t('The IDs will be used as example for correspond GAF.'),
