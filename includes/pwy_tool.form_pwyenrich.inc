@@ -252,7 +252,7 @@ function pwy_tool_enrich_form_submit($form, &$form_state) {
   }
 
   $pwyenrichjob['options'] = serialize($options);
-  $pwyenrich_program = 'pwy_tool.pl';
+  $pwyenrich_program = $goenrich_program = DRUPAL_ROOT . DIRECTORY_SEPARATOR . drupal_get_path('module', 'pwy_tool') . DIRECTORY_SEPARATOR . 'pwy_tool.pl';
 
   // SUBMIT JOB TO TRIPAL
   //-------------------------

@@ -21,6 +21,7 @@
  *   so, these var is directly used in goenrich_report template
  */
 function pwy_tool_preprocess_show_pwyenrich_report(&$vars) {
+  global $base_url;
 
   // Add CSS and Javascript files
   $path = drupal_get_path('module', 'pwy_tool');
@@ -48,6 +49,9 @@ function pwy_tool_preprocess_show_pwyenrich_report(&$vars) {
             else {
               if ($line[0] == '#idlink') {  
                 $vars['idlink'] = $line[1];
+                if (preg_match('/[site_url]/', $line[1])) {
+                  $vars['idlink'] = substr($base_url, 7) . substr($line[1], 10);
+                }
               }
               if ($line[0] == '#dblink') {
                 $vars['dblink'] = $line[1];

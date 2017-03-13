@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use IO::File;
 use Getopt::Std;
-use Statistics::Multtest;
+#use Statistics::Multtest;
 use FindBin;
 
 my %options;

@@ -5,7 +5,6 @@
 ?>
 
 <?php 
-
   // output pathway enrichment table
   if ($result_table) {
 
