@@ -16,6 +16,10 @@ function pwy_tool_enrich_form($form, $form_state) {
     if (isset($_SESSION['tripal_rnaseq_analysis']['genes_str'])) {
       $default_lists = $_SESSION['tripal_rnaseq_analysis']['genes_str'];
     }
+    if (isset($_SESSION['tripal_rnaseq_analysis']['organism_id'])) {
+      $organism_id = $_SESSION['tripal_rnaseq_analysis']['organism_id'];
+      $organism = chado_generate_var('organism', array('organism_id'=>$organism_id));
+    }
   }
 
   //* choose pwy dataset
@@ -35,8 +39,13 @@ function pwy_tool_enrich_form($form, $form_state) {
     'SELECT_DB' => 'Select a Dataset',
   );
 
+  $default_opt = 'SELECT_DB';
+
   foreach ($pwy_db as $nid => $pwy_array) {
     $options[$pwy_array[1]]  = $pwy_array[0];
+    if ($pwy_array[0] == $organism->common_name) {
+      $default_opt = $pwy_array[1];
+    }
     $id_link[$pwy_array[1]]  = $pwy_array[2];
     $db_link[$pwy_array[1]]  = $pwy_array[3];
     $db_expid[$pwy_array[1]] = $pwy_array[4];
@@ -51,7 +60,7 @@ function pwy_tool_enrich_form($form, $form_state) {
     '#type' => 'select',
     '#title' => t('Dataset:'),
     '#options' => $options,
-    //'#default_value' => 'SELECT_DB'; put default db for different web
+    '#default_value' => $default_opt,
     '#ajax' => array(
       'event' => 'change',
       'callback' => 'ajax_pwy_tool_enrich_example_id_callback',
@@ -327,12 +336,13 @@ function ajax_pwy_tool_enrich_example_id_callback($form, $form_state) {
   }
 
   // If the Show Example checkbox is true then put the example in the textfield
-  if ($form_state['values']['example_id']) {
-    $form['query']['ID']['#value'] = $example_ids;
-  }
-  // Otherwise we want to remove the already displayed example.
-  else {
-    $form['query']['ID']['#value'] = '';
+  if (!isset($_SESSION['tripal_rnaseq_analysis']['genes_str'])) {
+    if ($form_state['values']['example_id']) {
+      $form['query']['ID']['#value'] = $example_ids;
+    }
+    else {
+      $form['query']['ID']['#value'] = '';
+    }
   }
 
   return $form['query']['ID'];

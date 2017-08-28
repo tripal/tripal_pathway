@@ -1,13 +1,27 @@
 <?php
 /**
- * Display the results of a BLAST job execution
+ * Display the results of pathway enrichment
  */
-?>
 
-<?php 
+// dispaly breadcrumb
+$nav = array();
+$nav[] = l('Home', '/');
+$nav[] = l('Pathway enrichment', 'pwyenrich');
+$nav[] = t('Pathway enrichment result');
+$breadcrumb = '<nav class="nav">' . implode(" > ", $nav) . '</nav><br>';
+print $breadcrumb;
+
+
   // output pathway enrichment table
   if ($result_table) {
 
+    // download link
+    // dpm($tripal_args);
+    $pwy_file = '../../' . $tripal_args['output_file'];
+    $download_link = l('Tab-delimit Format', $pwy_file );
+    print '<p>Download pathway enrichment result: ' . $download_link . '</p>';
+
+    // result table
     $temp = array_keys($result_table[0]);
     array_shift($temp);
     $header_data = $temp;

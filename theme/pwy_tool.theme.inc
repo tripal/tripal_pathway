@@ -31,6 +31,7 @@ function pwy_tool_preprocess_show_pwyenrich_report(&$vars) {
   $tripal_job = tripal_get_job($vars['job_id']);
   $vars['tripal_job'] = $tripal_job;
   $tripal_args = unserialize($tripal_job->arguments);
+  $vars['tripal_args'] = $tripal_args;
   $vars['html_path'] = DRUPAL_ROOT . DIRECTORY_SEPARATOR . $tripal_args['output_file'];
   $vars['html_info'] = 'No result found';
 
