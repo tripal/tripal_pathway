@@ -217,7 +217,7 @@ END
 	my $add_qv_content;
 
 	if (scalar keys %pwy_qvalue > 0) {
-		$add_qv_content = "Pathway ID\tPathway Name\tCulster Frequency\tGenome Frequency\tP-value\tadj P\tGenes annotated to the pathway\n";
+		$add_qv_content = "Pathway ID\tPathway Name\tCluster frequency\tGenome frequency\tP-value\tadj P\tGenes annotated to the pathway\n";
 	} else {
 		$add_qv_content = "Pathway ID\tPathway Name\tCulster Frequency\tGenome Frequency\tP-value\tGenes annotated to the pathway\n";
 	}

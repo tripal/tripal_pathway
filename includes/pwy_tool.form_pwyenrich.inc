@@ -196,6 +196,9 @@ function pwy_tool_enrich_form_validate($form, &$form_state) {
     form_set_error('query', t('No gene IDs given.')); 
   } 
 
+  //dpm($form_state['values']['SELECT_PWY_DATASET']);
+  //form_set_error('query', t('No gene IDs given.'));
+
 }//go_tool_enrich_form_validate
 
 
@@ -233,9 +236,12 @@ function pwy_tool_enrich_form_submit($form, &$form_state) {
     }
   }
 
-  // GO annotation dataset
+  // pathway annotation dataset
   $selected_db = $form_state['values']['SELECT_PWY_DATASET'];
   $pwyenrichjob['pwy_file'] = $selected_db; //GAF_dataset_path_full;
+
+
+  
 
   // Determine the path to the pwy with extension.
   if (!is_readable($selected_db)) {
