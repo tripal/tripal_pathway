@@ -18,7 +18,7 @@ print $breadcrumb;
     // download link
     // dpm($tripal_args);
     $pwy_file = '../../' . $tripal_args['output_file'];
-    $download_link = l('Tab-delimit Format', $pwy_file );
+    $download_link = l('Tab-delimit format', $pwy_file );
     print '<p>Download pathway enrichment result: ' . $download_link . '</p>';
 
     // result table

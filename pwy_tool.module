@@ -43,7 +43,7 @@ function pwy_tool_menu() {
 
   // pwy enrich results page
   $items['pwyenrich/report/%'] = array(
-    'title' => 'Pathway enrichment results',
+    'title' => 'Pathway enrichment result',
     'page callback' => 'show_pwy_enrich_output',
     'page arguments' => array(2),
     'access arguments' => array('access content'),

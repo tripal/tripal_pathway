@@ -171,7 +171,7 @@ USAGE: $0 -t idlink -x dblink input_gene_list pathway_file output
 
     if ( $output_num > 0) { 
     	my $out1 = IO::File->new(">".$output_file) || die $!;
-		print $out1 "Pathway ID\tPathway Name\tCulster Frequency\tGenome Frequency\tP-value\tGenes annotated to the pathway\n";
+		print $out1 "Pathway ID\tPathway name\tCluster frequency\tGenome frequency\tP-value\tGenes annotated to the pathway\n";
 		foreach my $p (sort {$a<=>$b} keys %output_hash) {
 			foreach my $m (@{$output_hash{$p}}) {
 				print $out1 $m;
