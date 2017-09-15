@@ -11,7 +11,8 @@ use strict;
 use warnings;
 use IO::File;
 use Getopt::Std;
-#use Statistics::Multtest;
+use Statistics::Multtest qw(bonferroni holm hommel hochberg BH BY qvalue);
+use Statistics::Multtest qw(:all);
 use FindBin;
 
 my %options;
@@ -57,6 +58,8 @@ USAGE: $0 -t idlink -x dblink input_gene_list pathway_file output
 	while(<$fh1>)
 	{
 		chomp;
+		$_ =~ s/^\s+//ig;
+		$_ =~ s/\s+$//ig;
 		$changed_gene{$_} = 1;
 	}
 	$fh1->close;
@@ -124,6 +127,9 @@ USAGE: $0 -t idlink -x dblink input_gene_list pathway_file output
     my $output_num = 0;
 	my %output_hash; # key: pvalue, value, array of content line
 
+	my @p_array;
+	my @line;
+
 	foreach my $pid (sort keys %pwy_gene)
 	{
 		%uniq_gene = ();
@@ -163,15 +169,31 @@ USAGE: $0 -t idlink -x dblink input_gene_list pathway_file output
 			my $background = "$M out of $N genes";
 			my $cluster = "$x out of $n genes";
 			my $genes = join(", ", @{$pwy_clsgene{$pid}});
-			my $output_line = "$pid\t$p_name\t$cluster\t$background\t$pvalue\t$genes\n";
-			push (@{$output_hash{$pvalue}}, $output_line);
+			my $output_line = "$pid\t$p_name\t$cluster\t$background\t$pvalue\t$genes";
+			push(@p_array, $pvalue);
+			push(@line, $output_line);
+			#push (@{$output_hash{$pvalue}}, $output_line);
 			$output_num++;
 		}
 	}
 
+	my $res = BH(\@p_array);
+
+	$output_num = 0;
+
+	foreach my $l (@line) {
+            my @m = split(/\t/, $l);
+            my $qvalue = shift @$res;
+			next if $qvalue > $pcutoff; 
+			$output_num++;
+            my $output_line = "$m[0]\t$m[1]\t$m[2]\t$m[3]\t$m[4]\t$qvalue\t$m[5]\n";
+            push (@{$output_hash{$qvalue}}, $output_line);
+	}
+
     if ( $output_num > 0) { 
+
     	my $out1 = IO::File->new(">".$output_file) || die $!;
-		print $out1 "Pathway ID\tPathway name\tCluster frequency\tGenome frequency\tP-value\tGenes annotated to the pathway\n";
+		print $out1 "Pathway ID\tPathway name\tCluster frequency\tGenome frequency\tP-value\tadj P\tGenes annotated to the pathway\n";
 		foreach my $p (sort {$a<=>$b} keys %output_hash) {
 			foreach my $m (@{$output_hash{$p}}) {
 				print $out1 $m;
@@ -179,72 +201,7 @@ USAGE: $0 -t idlink -x dblink input_gene_list pathway_file output
 		}
 		$out1->close;
 	}
-
-	# adjust p value to q value
-	if ( $output_num > 10) {
-		my $output_dat = $output_file.".qvalue.txt";
-
-		my $R_CODE =<< "END";
-library(qvalue)
-data<-read.delim(file="$output_file", header=TRUE)
-p<-data[,5]
-qobj<-qvalue(p)
-alldata<-cbind(data,qobj\$qvalue)
-write.table(file="$output_dat", sep="\\t", alldata);
-END
-
-		#print $R_CODE; exit;
-		open R,"|/usr/bin/R --vanilla --slave" or die $!;
-		print R $R_CODE;
-		close R;
-	}
-
-	# append Qvalue to output and apply p cutoff
-    # load q value to hash
-	my %pwy_qvalue;
-	if (-s $output_file.".qvalue.txt") {
-		my $ap0 = IO::File->new($output_file.".qvalue.txt") || die $!;
-		<$ap0>;
-		while(<$ap0>) {
-			chomp;
-			$_ =~ s/"//ig;
-			my @a = split(/\t/, $_);
-			$pwy_qvalue{$a[1]} = $a[7];
-		}
-		$ap0->close;
-	}
-
-	my $add_qv_content;
-
-	if (scalar keys %pwy_qvalue > 0) {
-		$add_qv_content = "Pathway ID\tPathway Name\tCluster frequency\tGenome frequency\tP-value\tadj P\tGenes annotated to the pathway\n";
-	} else {
-		$add_qv_content = "Pathway ID\tPathway Name\tCulster Frequency\tGenome Frequency\tP-value\tGenes annotated to the pathway\n";
-	}
-	my $ap1 = IO::File->new($output_file) || die $!;
-	<$ap1>;
-	while(<$ap1>) {
-		chomp;
-		my @a = split(/\t/, $_);
-		if (defined $pwy_qvalue{$a[0]}) {
-			my $q = parse_pvalue($pwy_qvalue{$a[0]});
-			my $p_return = parse_pvalue($a[4]);
-			next if ($a[4] > $pcutoff && $q > $pcutoff);
-			$add_qv_content.="$a[0]\t$a[1]\t$a[2]\t$a[3]\t$p_return\t$q\t$a[5]\n";
-		}
-		else
-		{
-			my $p_return = parse_pvalue($a[4]);
-			next if $a[4] > $pcutoff;
-			$add_qv_content.="$a[0]\t$a[1]\t$a[2]\t$a[3]\t$p_return\t$a[5]\n";
-		}
-	}
-	$ap1->close;
-
-    $ap1 = IO::File->new(">".$output_file) || die $!;
-	print $ap1 $add_qv_content;
-	$ap1->close;
-	# append id link and db link to output
+	# print $output_num."\n";
 
     my $ap2 = IO::File->new(">>". $output_file) || die $!;
     print $ap2 "#idlink\t$idlink\n#dblink\t$dblink\n";

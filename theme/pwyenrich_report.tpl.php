@@ -31,8 +31,7 @@ print $breadcrumb;
     {
       $line_html = array();
       $pwy_id = $line['Pathway ID'];
-      $pwy_name = $line['Pathway Name'];
-      
+      $pwy_name = $line['Pathway name'];
 
       $line_html[0] = "<a href=http://$dblink" . "$pwy_id target=_blank>$pwy_id<br>$pwy_name</a>"; 
       $line_html[1] = $line[$header_data[1]];

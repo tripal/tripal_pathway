@@ -287,7 +287,7 @@ function pwy_tool_enrich_form_submit($form, &$form_state) {
     // set output dir and file
     $output_dir = variable_get('file_public_path', conf_path() . '/files')
       . DIRECTORY_SEPARATOR . 'tripal' . DIRECTORY_SEPARATOR . 'tripal_pathway';
-    $output_file = $output_dir . DIRECTORY_SEPARATOR . date('YMd_His') . '.pwyenrich.html';
+    $output_file = $output_dir . DIRECTORY_SEPARATOR . date('YMd_His') . '.pwyenrich.txt';
 
     $job_args = array(
       'program' => $pwyenrich_program,
